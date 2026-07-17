@@ -1,5 +1,7 @@
 # HeadHunt
 
+[![CI](https://github.com/QuQuLa89/Head-Hunt-Plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/QuQuLa89/Head-Hunt-Plugin/actions/workflows/ci.yml)
+
 Kotlin製の[PaperMC](https://papermc.io/)サーバー向け、頭ブロックを使った宝探しミニゲームプラグインです。
 
 頭（スカル）ブロックをマップ内に「宝」として隠しておき、ソロ戦またはチーム戦でプレイヤーが右クリックしてすべての宝を探し出す速さを競います。
