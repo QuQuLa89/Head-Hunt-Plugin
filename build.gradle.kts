@@ -17,10 +17,10 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:26.1.2.build.74-stable")
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     implementation(kotlin("stdlib"))
     testImplementation(kotlin("test-junit5"))
-    testImplementation("io.papermc.paper:paper-api:26.1.2.build.74-stable")
+    testImplementation("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
