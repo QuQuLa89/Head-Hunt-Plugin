@@ -1,16 +1,15 @@
 package com.ququla89.headhunt
 
 import com.ququla89.headhunt.command.HeadHuntCommand
+import com.ququla89.headhunt.listener.TreasureListener
 import com.ququla89.headhunt.manager.GameManager
 import com.ququla89.headhunt.manager.TeamManager
 import com.ququla89.headhunt.manager.TreasureManager
-import com.ququla89.headhunt.listener.TreasureListener
 import org.bukkit.NamespacedKey
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
 class HeadHuntPlugin : JavaPlugin() {
-
     private lateinit var treasureManager: TreasureManager
     private lateinit var teamManager: TeamManager
     private lateinit var gameManager: GameManager

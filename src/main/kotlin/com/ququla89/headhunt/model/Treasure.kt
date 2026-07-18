@@ -17,7 +17,10 @@ data class Treasure(
     }
 
     companion object {
-        fun fromLocation(id: UUID, location: Location): Treasure =
+        fun fromLocation(
+            id: UUID,
+            location: Location,
+        ): Treasure =
             Treasure(
                 id = id,
                 worldName = requireNotNull(location.world) { "Location must have a world" }.name,

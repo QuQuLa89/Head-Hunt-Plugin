@@ -24,7 +24,6 @@ class TreasureListener(
     private val treasureManager: TreasureManager,
     private val gameManager: GameManager,
 ) : Listener {
-
     @EventHandler(priority = EventPriority.HIGH)
     fun onInteract(event: PlayerInteractEvent) {
         if (event.hand != EquipmentSlot.HAND) return
@@ -75,17 +74,28 @@ class TreasureListener(
         }
     }
 
-    private fun handleFind(player: Player, treasureId: UUID) {
+    private fun handleFind(
+        player: Player,
+        treasureId: UUID,
+    ) {
         when (val outcome = gameManager.onTreasureFound(player.uniqueId, treasureId)) {
             is FindOutcome.NotInTeam -> {
                 player.sendMessage(PREFIX + "§cチームに参加してください。")
             }
-            is FindOutcome.AlreadyFoundBySelf -> Unit
+
+            is FindOutcome.AlreadyFoundBySelf -> {
+                Unit
+            }
+
             is FindOutcome.AlreadyFoundByTeammate -> {
                 val finderName = Bukkit.getOfflinePlayer(outcome.finderId).name ?: "誰か"
                 player.sendMessage(PREFIX + "§eチームメイトの${finderName}さんが発見済みです。")
             }
-            is FindOutcome.GameNotRunning -> Unit
+
+            is FindOutcome.GameNotRunning -> {
+                Unit
+            }
+
             is FindOutcome.Found -> {
                 player.sendMessage(PREFIX + "§a宝を発見しました！")
                 if (outcome.complete) {
@@ -95,12 +105,16 @@ class TreasureListener(
         }
     }
 
-    private fun announceCompletion(finder: Player, winnerTeamName: String?) {
-        val message = if (winnerTeamName != null) {
-            PREFIX + "§b${finder.name} §aさんがすべての宝を発見し、§b${winnerTeamName} §aチームの勝利です！"
-        } else {
-            PREFIX + "§b${finder.name} §aさんがすべての宝を発見しました！"
-        }
+    private fun announceCompletion(
+        finder: Player,
+        winnerTeamName: String?,
+    ) {
+        val message =
+            if (winnerTeamName != null) {
+                PREFIX + "§b${finder.name} §aさんがすべての宝を発見し、§b$winnerTeamName §aチームの勝利です！"
+            } else {
+                PREFIX + "§b${finder.name} §aさんがすべての宝を発見しました！"
+            }
         Bukkit.broadcastMessage(message)
         Bukkit.getConsoleSender().sendMessage(message)
     }

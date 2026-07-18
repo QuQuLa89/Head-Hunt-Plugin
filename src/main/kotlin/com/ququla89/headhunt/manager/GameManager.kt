@@ -7,15 +7,27 @@ import java.util.UUID
 
 sealed interface FindOutcome {
     data object GameNotRunning : FindOutcome
+
     data object NotInTeam : FindOutcome
+
     data object AlreadyFoundBySelf : FindOutcome
-    data class AlreadyFoundByTeammate(val finderId: UUID) : FindOutcome
-    data class Found(val complete: Boolean, val winnerId: UUID?, val winnerTeamName: String?) : FindOutcome
+
+    data class AlreadyFoundByTeammate(
+        val finderId: UUID,
+    ) : FindOutcome
+
+    data class Found(
+        val complete: Boolean,
+        val winnerId: UUID?,
+        val winnerTeamName: String?,
+    ) : FindOutcome
 }
 
 sealed interface StartError {
     data object AlreadyRunning : StartError
+
     data object NoTreasures : StartError
+
     data object NotEnoughTeams : StartError
 }
 
@@ -40,7 +52,10 @@ class GameManager(
     val isRunning: Boolean
         get() = state == GameState.RUNNING
 
-    fun start(mode: GameMode, teamMode: TeamMode): StartError? {
+    fun start(
+        mode: GameMode,
+        teamMode: TeamMode,
+    ): StartError? {
         if (state == GameState.RUNNING) return StartError.AlreadyRunning
         if (treasureManager.size == 0) return StartError.NoTreasures
         if (mode == GameMode.TEAM && teamManager.all().size < 2) return StartError.NotEnoughTeams
@@ -69,21 +84,33 @@ class GameManager(
 
     fun findsOfTeam(teamName: String): Set<UUID> = teamFound[teamName]?.keys ?: emptySet()
 
-    fun onTreasureFound(playerId: UUID, treasureId: UUID): FindOutcome {
+    fun onTreasureFound(
+        playerId: UUID,
+        treasureId: UUID,
+    ): FindOutcome {
         if (state != GameState.RUNNING) return FindOutcome.GameNotRunning
         val currentMode = mode ?: return FindOutcome.GameNotRunning
         val total = treasureManager.size
 
         return when (currentMode) {
-            GameMode.SOLO -> findSolo(playerId, treasureId, total)
-            GameMode.TEAM -> when (teamMode) {
-                TeamMode.INDIVIDUAL -> findSolo(playerId, treasureId, total)
-                TeamMode.SHARED -> findShared(playerId, treasureId, total)
+            GameMode.SOLO -> {
+                findSolo(playerId, treasureId, total)
+            }
+
+            GameMode.TEAM -> {
+                when (teamMode) {
+                    TeamMode.INDIVIDUAL -> findSolo(playerId, treasureId, total)
+                    TeamMode.SHARED -> findShared(playerId, treasureId, total)
+                }
             }
         }
     }
 
-    private fun findSolo(playerId: UUID, treasureId: UUID, total: Int): FindOutcome {
+    private fun findSolo(
+        playerId: UUID,
+        treasureId: UUID,
+        total: Int,
+    ): FindOutcome {
         val set = soloFound.getOrPut(playerId) { mutableSetOf() }
         if (treasureId in set) return FindOutcome.AlreadyFoundBySelf
         set.add(treasureId)
@@ -93,7 +120,11 @@ class GameManager(
         return FindOutcome.Found(complete, if (complete) playerId else null, if (complete) teamName else null)
     }
 
-    private fun findShared(playerId: UUID, treasureId: UUID, total: Int): FindOutcome {
+    private fun findShared(
+        playerId: UUID,
+        treasureId: UUID,
+        total: Int,
+    ): FindOutcome {
         val team = teamManager.teamOf(playerId) ?: return FindOutcome.NotInTeam
         val map = teamFound.getOrPut(team.name) { mutableMapOf() }
         val existingFinder = map[treasureId]
