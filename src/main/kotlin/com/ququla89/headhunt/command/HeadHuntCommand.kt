@@ -48,14 +48,13 @@ class HeadHuntCommand(
         sender.sendMessage(PREFIX + "/headhunt <setmode|start|reset|stop|list|deleteall|team> ...")
     }
 
-    private fun requireAdmin(sender: CommandSender): Boolean {
-        return if (!sender.hasPermission("headhunt.admin")) {
+    private fun requireAdmin(sender: CommandSender): Boolean =
+        if (!sender.hasPermission("headhunt.admin")) {
             sender.sendMessage(PREFIX + "この操作を行う権限がありません。")
             false
         } else {
             true
         }
-    }
 
     private fun requirePlayer(sender: CommandSender): Player? {
         if (sender !is Player) {
@@ -396,23 +395,24 @@ class HeadHuntCommand(
             }
 
             3 -> {
-                val candidates = when {
-                    args[0].equals("start", true) && args[1].equals("team", true) -> {
-                        listOf("shared", "individual")
-                    }
+                val candidates =
+                    when {
+                        args[0].equals("start", true) && args[1].equals("team", true) -> {
+                            listOf("shared", "individual")
+                        }
 
-                    args[0].equals("team", true) && args[1].equals("leave", true) -> {
-                        Bukkit.getOnlinePlayers().map { it.name }
-                    }
+                        args[0].equals("team", true) && args[1].equals("leave", true) -> {
+                            Bukkit.getOnlinePlayers().map { it.name }
+                        }
 
-                    args[0].equals("team", true) && args[1] in listOf("join", "delete") -> {
-                        teamManager.all().map { it.name }
-                    }
+                        args[0].equals("team", true) && args[1] in listOf("join", "delete") -> {
+                            teamManager.all().map { it.name }
+                        }
 
-                    else -> {
-                        emptyList()
+                        else -> {
+                            emptyList()
+                        }
                     }
-                }
                 candidates.filter { it.startsWith(args[2].lowercase()) }
             }
 
