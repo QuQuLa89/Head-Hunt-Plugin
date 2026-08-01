@@ -51,11 +51,9 @@ class HeadHuntCommand(
         sender.sendMessage(PREFIX + "/headhunt <setmode|start|reset|stop|list|deleteall|validate|repair|team> ...")
     }
 
-    override fun canUse(sender: CommandSender): Boolean =
-        sender.hasPermission("headhunt.use") || sender.hasPermission("headhunt.admin")
+    override fun canUse(sender: CommandSender): Boolean = sender.hasPermission("headhunt.use") || sender.hasPermission("headhunt.admin")
 
-    private fun requireAdmin(sender: CommandSender): Boolean {
-
+    private fun requireAdmin(sender: CommandSender): Boolean =
         if (!sender.hasPermission("headhunt.admin")) {
             sender.sendMessage(PREFIX + "この操作を行う権限がありません。")
             false
@@ -478,8 +476,7 @@ class HeadHuntCommand(
                 buildList {
                     if (isAdmin) addAll(listOf("setmode", "start", "reset", "stop", "list", "deleteall", "validate", "repair"))
                     if (canUse) add("team")
-                }
-                    .filter { it.startsWith(args[0].lowercase()) }
+                }.filter { it.startsWith(args[0].lowercase()) }
             }
 
             2 -> {
@@ -497,7 +494,6 @@ class HeadHuntCommand(
             }
 
             3 -> {
-
                 when {
                     isAdmin && args[0].equals("start", true) && args[1].equals("team", true) -> {
                         listOf("shared", "individual")
@@ -517,9 +513,8 @@ class HeadHuntCommand(
 
                     else -> {
                         emptyList()
-
                     }
-                candidates.filter { it.startsWith(args[2].lowercase()) }
+                }.filter { it.startsWith(args[2].lowercase()) }
             }
 
             4 -> {
