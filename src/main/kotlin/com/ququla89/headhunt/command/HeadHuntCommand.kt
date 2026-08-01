@@ -49,11 +49,9 @@ class HeadHuntCommand(
     }
 
     private fun requireAdmin(sender: CommandSender): Boolean {
-        if (!sender.hasPermission("headhunt.admin")) {
-            sender.sendMessage(PREFIX + "この操作を行う権限がありません。")
-            return false
-        }
-        return true
+        if (sender.hasPermission("headhunt.admin")) return true
+        sender.sendMessage(PREFIX + "この操作を行う権限がありません。")
+        return false
     }
 
     private fun requirePlayer(sender: CommandSender): Player? {
