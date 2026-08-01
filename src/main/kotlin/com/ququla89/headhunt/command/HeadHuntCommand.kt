@@ -408,9 +408,7 @@ class HeadHuntCommand(
                         teamManager.all().map { it.name }
                     }
 
-                    else -> {
-                        emptyList()
-                    }
+                    else -> emptyList()
                 }.filter { it.startsWith(args[2].lowercase()) }
             }
 
