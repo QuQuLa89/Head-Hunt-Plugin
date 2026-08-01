@@ -2,13 +2,13 @@ package com.ququla89.headhunt.manager
 
 import com.ququla89.headhunt.model.GameMode
 import com.ququla89.headhunt.model.TeamMode
+import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import java.util.UUID
 
 class GameManagerTest {
     private val treasureOne = UUID.randomUUID()
