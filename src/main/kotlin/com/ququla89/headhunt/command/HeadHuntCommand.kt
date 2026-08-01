@@ -51,16 +51,15 @@ class HeadHuntCommand(
         sender.sendMessage(PREFIX + "/headhunt <setmode|start|reset|stop|list|deleteall|validate|repair|team> ...")
     }
 
-    override fun canUse(sender: CommandSender): Boolean =
-        sender.hasPermission("headhunt.use") || sender.hasPermission("headhunt.admin")
+    override fun canUse(sender: CommandSender): Boolean = sender.hasPermission("headhunt.use") || sender.hasPermission("headhunt.admin")
 
-    private fun requireAdmin(sender: CommandSender): Boolean {
+    private fun requireAdmin(sender: CommandSender): Boolean =
         if (!sender.hasPermission("headhunt.admin")) {
             sender.sendMessage(PREFIX + "この操作を行う権限がありません。")
-            return false
+            false
+        } else {
+            true
         }
-        return true
-    }
 
     private fun requirePlayer(sender: CommandSender): Player? {
         if (sender !is Player) {
@@ -477,8 +476,7 @@ class HeadHuntCommand(
                 buildList {
                     if (isAdmin) addAll(listOf("setmode", "start", "reset", "stop", "list", "deleteall", "validate", "repair"))
                     if (canUse) add("team")
-                }
-                    .filter { it.startsWith(args[0].lowercase()) }
+                }.filter { it.startsWith(args[0].lowercase()) }
             }
 
             2 -> {
