@@ -49,9 +49,12 @@ class HeadHuntCommand(
     }
 
     private fun requireAdmin(sender: CommandSender): Boolean {
-        if (sender.hasPermission("headhunt.admin")) return true
-        sender.sendMessage(PREFIX + "この操作を行う権限がありません。")
-        return false
+        return if (!sender.hasPermission("headhunt.admin")) {
+            sender.sendMessage(PREFIX + "この操作を行う権限がありません。")
+            false
+        } else {
+            true
+        }
     }
 
     private fun requirePlayer(sender: CommandSender): Player? {
@@ -393,7 +396,7 @@ class HeadHuntCommand(
             }
 
             3 -> {
-                when {
+                val candidates = when {
                     args[0].equals("start", true) && args[1].equals("team", true) -> {
                         listOf("shared", "individual")
                     }
@@ -406,8 +409,11 @@ class HeadHuntCommand(
                         teamManager.all().map { it.name }
                     }
 
-                    else -> emptyList()
-                }.filter { it.startsWith(args[2].lowercase()) }
+                    else -> {
+                        emptyList()
+                    }
+                }
+                candidates.filter { it.startsWith(args[2].lowercase()) }
             }
 
             4 -> {
