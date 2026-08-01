@@ -9,3 +9,5 @@ out/
 run/
 local.properties
 bin/
+/ktlint
+/ktlint.exe
