@@ -3,7 +3,7 @@ import org.gradle.api.file.DuplicatesStrategy
 plugins {
     kotlin("jvm") version "2.4.10"
     id("com.gradleup.shadow") version "9.6.1"
-    id("xyz.jpenilla.run-paper") version "3.0.2"
+    id("xyz.jpenilla.run-paper") version "3.1.0"
 }
 
 group = "com.ququla89"
