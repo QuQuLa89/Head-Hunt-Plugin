@@ -1,11 +1,11 @@
 package com.ququla89.headhunt.manager
 
+import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import java.util.UUID
 
 class TeamManagerTest {
     @Test

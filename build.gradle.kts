@@ -3,7 +3,6 @@ import org.gradle.api.file.DuplicatesStrategy
 plugins {
     kotlin("jvm") version "2.4.20"
     id("com.gradleup.shadow") version "9.6.1"
-    id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
 group = "com.ququla89"
@@ -28,8 +27,6 @@ kotlin {
     jvmToolchain(21)
 }
 
-runPaper.disablePluginJarDetection()
-
 tasks {
     shadowJar {
         archiveBaseName.set("HeadHunt")
@@ -50,11 +47,5 @@ tasks {
 
     test {
         useJUnitPlatform()
-    }
-
-    runServer {
-        minecraftVersion("1.21.4")
-        pluginJars.from(shadowJar)
-        disablePluginRemapping()
     }
 }
