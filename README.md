@@ -106,11 +106,7 @@ LinuxまたはmacOSでは次を実行します。
 
 テストとビルドが成功すると、シェード済みJARを`build/libs/HeadHunt-<version>.jar`へ出力します。
 
-ローカルのPaper 1.21.4テストサーバーを起動する場合は、次を実行します。
-
-```bash
-./gradlew runServer
-```
+コミット前の整形には、CIと同じktlint 1.3.1のJARをプロジェクト直下の`ktlint`として配置し、`pre-commit install`と`pre-commit run --all-files`を実行します。
 
 ## ライセンス
 

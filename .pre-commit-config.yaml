@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ktlint
+        name: Kotlinコードを整形します
+        entry: java -jar ktlint -F
+        language: system
+        files: '\.kts?$'
+        types: [text]
