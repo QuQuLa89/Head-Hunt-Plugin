@@ -159,7 +159,7 @@ class TreasureListener(
         val block = event.block
         if (!treasureManager.isTreasureBlock(block)) return
 
-        if (gameManager.isRunning && treasureManager.findAt(block) != null) {
+        if (gameManager.isRunning || !event.player.hasPermission("headhunt.admin")) {
             event.isCancelled = true
             return
         }

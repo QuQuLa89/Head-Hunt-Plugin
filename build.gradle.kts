@@ -19,6 +19,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     implementation(kotlin("stdlib"))
     testImplementation(kotlin("test-junit5"))
+    testImplementation("org.mockito:mockito-core:5.20.0")
     testImplementation("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
