@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.ququla89"
-version = "1.0.0"
+version = "1.1.1"
 
 val pluginVersion = version.toString()
 
