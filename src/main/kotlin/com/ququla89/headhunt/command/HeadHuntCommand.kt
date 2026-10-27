@@ -481,15 +481,28 @@ class HeadHuntCommand(
 
             2 -> {
                 when (args[0].lowercase()) {
-                    "setmode" -> if (isAdmin) listOf("on", "off") else emptyList()
-                    "start" -> if (isAdmin) listOf("solo", "team") else emptyList()
-                    "deleteall" -> if (isAdmin) listOf("confirm") else emptyList()
-                    "team" ->
+                    "setmode" -> {
+                        if (isAdmin) listOf("on", "off") else emptyList()
+                    }
+
+                    "start" -> {
+                        if (isAdmin) listOf("solo", "team") else emptyList()
+                    }
+
+                    "deleteall" -> {
+                        if (isAdmin) listOf("confirm") else emptyList()
+                    }
+
+                    "team" -> {
                         buildList {
                             if (isAdmin) addAll(listOf("create", "join", "leave", "delete"))
                             if (canUse) addAll(listOf("list", "info"))
                         }
-                    else -> emptyList()
+                    }
+
+                    else -> {
+                        emptyList()
+                    }
                 }.filter { it.startsWith(args[1].lowercase()) }
             }
 
