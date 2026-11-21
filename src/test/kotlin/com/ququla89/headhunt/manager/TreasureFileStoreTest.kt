@@ -57,4 +57,17 @@ class TreasureFileStoreTest {
         assertEquals(setOf(validId), loaded.keys)
         assertEquals(Treasure(validId, "world", 1, 64, 2), loaded[validId])
     }
+
+    @Test
+    fun `load falls back to backup when main file is malformed`() {
+        val dataFile = tempDirectory.resolve("treasures_broken.yml").toFile()
+        val backupFile = tempDirectory.resolve("treasures_broken.yml.bak").toFile()
+        val store = TreasureFileStore(dataFile, logger)
+        val treasure = Treasure(UUID.randomUUID(), "world", 10, 64, 20)
+        TreasureFileStore(backupFile, logger).save(listOf(treasure))
+        dataFile.writeText("invalid: yaml: [broken")
+
+        val loaded = store.load()
+        assertEquals(listOf(treasure), loaded.values.toList())
+    }
 }
