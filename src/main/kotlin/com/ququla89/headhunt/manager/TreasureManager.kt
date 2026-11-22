@@ -42,8 +42,6 @@ class TreasureManager(
 
     fun all(): Collection<Treasure> = treasures.values
 
-    fun find(id: UUID): Treasure? = treasures[id]
-
     fun findAt(block: Block): Treasure? {
         val id = readTreasureId(block) ?: return null
         val treasure = treasures[id] ?: return null
@@ -77,15 +75,13 @@ class TreasureManager(
         return treasure
     }
 
-    fun unregister(id: UUID): Treasure? = treasures.remove(id)
-
     fun unregisterAt(block: Block): Treasure? {
         val id = readTreasureId(block) ?: return null
         val registeredTreasure = findAt(block)
         val state = block.state as? TileState ?: return null
         state.persistentDataContainer.remove(treasureIdKey)
         if (!state.update(true, false)) return null
-        return if (registeredTreasure?.id == id) unregister(id) else null
+        return if (registeredTreasure?.id == id) treasures.remove(id) else null
     }
 
     fun clearAll(): TreasureClearResult {
