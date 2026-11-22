@@ -1,6 +1,7 @@
 package com.ququla89.headhunt.manager
 
 import com.ququla89.headhunt.model.Treasure
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 import java.io.FileOutputStream
@@ -19,18 +20,43 @@ class TreasureFileStore(
 ) {
     fun load(): LinkedHashMap<UUID, Treasure> {
         val treasures = linkedMapOf<UUID, Treasure>()
-        if (!dataFile.exists()) return treasures
+        val backupFile = File(dataFile.parentFile, dataFile.name + ".bak")
 
-        val yaml =
-            runCatching { YamlConfiguration().apply { load(dataFile) } }
-                .getOrElse { ex ->
-                    logger.log(Level.WARNING, "宝HEADデータの読み込みに失敗したためバックアップを確認します: ${ex.message}")
-                    val backupFile = File(dataFile.parentFile, dataFile.name + ".bak")
-                    if (!backupFile.exists()) return treasures
-                    runCatching { YamlConfiguration().apply { load(backupFile) } }
-                        .getOrElse { return treasures }
+        fun loadBackup(): ConfigurationSection? {
+            if (!backupFile.exists()) return null
+            val backupYaml =
+                runCatching { YamlConfiguration().apply { load(backupFile) } }
+                    .getOrElse { backupEx ->
+                        logger.log(
+                            Level.WARNING,
+                            "バックアップ(${backupFile.name})の読み込みにも失敗しました: ${backupEx.message}",
+                        )
+                        return null
+                    }
+            return backupYaml.getConfigurationSection("treasures")
+        }
+
+        val section =
+            if (!dataFile.exists()) {
+                if (!backupFile.exists()) return treasures
+                logger.warning("${dataFile.name}が存在しないためバックアップから読み込みます。")
+                loadBackup() ?: return treasures
+            } else {
+                val yaml =
+                    runCatching { YamlConfiguration().apply { load(dataFile) } }
+                        .getOrElse { ex ->
+                            logger.log(
+                                Level.WARNING,
+                                "宝HEADデータの読み込みに失敗したためバックアップを確認します: ${ex.message}",
+                            )
+                            return@getOrElse null
+                        }
+                val mainSection = yaml?.getConfigurationSection("treasures")
+                if (yaml != null && mainSection == null) {
+                    logger.warning("${dataFile.name}にtreasuresセクションがないためバックアップを確認します。")
                 }
-        val section = yaml.getConfigurationSection("treasures") ?: return treasures
+                mainSection ?: (loadBackup() ?: return treasures)
+            }
         for (key in section.getKeys(false)) {
             val entry = section.getConfigurationSection(key)
             if (entry == null) {

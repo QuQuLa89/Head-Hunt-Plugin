@@ -87,6 +87,13 @@ class TreasureListener(
 
         val mainHandEmpty = player.inventory.itemInMainHand.type == Material.AIR
         if (mainHandEmpty) {
+            if (markerId != null && treasureManager.contains(markerId)) {
+                player.sendMessage(
+                    PREFIX + "§c別の座標で登録済みの宝IDが複製されています。スニーク右クリックで古いIDを解除してから再登録してください。",
+                )
+                event.isCancelled = true
+                return
+            }
             val treasure = treasureManager.register(block.location)
             if (treasure != null) {
                 if (saveOrWarn(player)) {
@@ -150,6 +157,13 @@ class TreasureListener(
         if (!gameManager.isSetModeEnabled(player.uniqueId)) return
         if (!player.hasPermission("headhunt.admin")) return
         if (event.block.state !is Skull) return
+
+        val existingId = treasureManager.readTreasureId(event.block)
+        if (existingId != null && treasureManager.contains(existingId)) {
+            event.isCancelled = true
+            player.sendMessage(PREFIX + "§c登録済みの宝IDが複製された頭ブロックは設置できません。通常の頭ブロックを使用してください。")
+            return
+        }
 
         val treasure = treasureManager.register(event.block.location)
         if (treasure != null) {

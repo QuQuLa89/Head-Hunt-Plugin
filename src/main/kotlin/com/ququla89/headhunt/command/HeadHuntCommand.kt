@@ -483,7 +483,7 @@ class HeadHuntCommand(
                 buildList {
                     if (isAdmin) addAll(listOf("setmode", "start", "reset", "stop", "list", "deleteall", "validate", "repair"))
                     if (canUse) add("team")
-                }.filter { it.startsWith(args[0].lowercase()) }
+                }.filter { it.startsWith(args[0], ignoreCase = true) }
             }
 
             2 -> {
@@ -510,7 +510,7 @@ class HeadHuntCommand(
                     else -> {
                         emptyList()
                     }
-                }.filter { it.startsWith(args[1].lowercase()) }
+                }.filter { it.startsWith(args[1], ignoreCase = true) }
             }
 
             3 -> {
@@ -534,12 +534,12 @@ class HeadHuntCommand(
                     else -> {
                         emptyList()
                     }
-                }.filter { it.startsWith(args[2].lowercase()) }
+                }.filter { it.startsWith(args[2], ignoreCase = true) }
             }
 
             4 -> {
                 if (isAdmin && args[0].equals("team", true) && args[1].equals("join", true)) {
-                    Bukkit.getOnlinePlayers().map { it.name }.filter { it.startsWith(args[3].lowercase()) }
+                    Bukkit.getOnlinePlayers().map { it.name }.filter { it.startsWith(args[3], ignoreCase = true) }
                 } else {
                     emptyList()
                 }
