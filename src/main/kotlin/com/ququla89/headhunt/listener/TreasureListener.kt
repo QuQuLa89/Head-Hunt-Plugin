@@ -3,6 +3,7 @@ package com.ququla89.headhunt.listener
 import com.ququla89.headhunt.manager.FindOutcome
 import com.ququla89.headhunt.manager.GameManager
 import com.ququla89.headhunt.manager.TreasureManager
+import com.ququla89.headhunt.util.PREFIX
 import com.ququla89.headhunt.util.broadcastLegacy
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -24,8 +25,6 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.EquipmentSlot
 import java.util.UUID
-
-private const val PREFIX = "§6[HeadHunt] §r"
 
 class TreasureListener(
     private val treasureManager: TreasureManager,

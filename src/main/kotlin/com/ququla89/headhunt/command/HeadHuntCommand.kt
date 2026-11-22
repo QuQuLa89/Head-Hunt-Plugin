@@ -5,7 +5,9 @@ import com.ququla89.headhunt.manager.StartError
 import com.ququla89.headhunt.manager.TeamManager
 import com.ququla89.headhunt.manager.TreasureManager
 import com.ququla89.headhunt.model.GameMode
+import com.ququla89.headhunt.model.Team
 import com.ququla89.headhunt.model.TeamMode
+import com.ququla89.headhunt.util.PREFIX
 import com.ququla89.headhunt.util.broadcastLegacy
 import io.papermc.paper.command.brigadier.BasicCommand
 import io.papermc.paper.command.brigadier.CommandSourceStack
@@ -13,13 +15,13 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-private const val PREFIX = "§6[HeadHunt] §r"
 private const val CONFIRM_TIMEOUT_MILLIS = 30_000L
 
 class HeadHuntCommand(
     private val treasureManager: TreasureManager,
     private val teamManager: TeamManager,
     private val gameManager: GameManager,
+    private val clock: () -> Long = System::currentTimeMillis,
 ) : BasicCommand {
     private val pendingDeleteConfirmations: MutableMap<String, Long> = mutableMapOf()
 
@@ -250,7 +252,7 @@ class HeadHuntCommand(
             return
         }
 
-        val now = System.currentTimeMillis()
+        val now = clock()
         pendingDeleteConfirmations.entries.removeIf { now - it.value > CONFIRM_TIMEOUT_MILLIS }
         val senderKey = if (sender is Player) sender.uniqueId.toString() else "console:${sender.name}"
         if (args.getOrNull(1)?.lowercase() == "confirm") {
@@ -429,6 +431,9 @@ class HeadHuntCommand(
         sender.sendMessage(PREFIX + "チーム " + name + " を削除しました。")
     }
 
+    private fun formatMemberNames(team: Team): String =
+        team.members.joinToString(", ") { Bukkit.getOfflinePlayer(it).name ?: it.toString() }
+
     private fun handleTeamList(sender: CommandSender) {
         if (!requireUse(sender)) return
         val teams = teamManager.all()
@@ -438,8 +443,7 @@ class HeadHuntCommand(
         }
         sender.sendMessage(PREFIX + "チーム一覧 (" + teams.size + "件):")
         for (team in teams) {
-            val memberNames = team.members.joinToString(", ") { Bukkit.getOfflinePlayer(it).name ?: it.toString() }
-            sender.sendMessage("- " + team.name + " [" + team.members.size + "人]: " + memberNames)
+            sender.sendMessage("- " + team.name + " [" + team.members.size + "人]: " + formatMemberNames(team))
         }
     }
 
@@ -463,9 +467,8 @@ class HeadHuntCommand(
             return
         }
 
-        val memberNames = team.members.joinToString(", ") { Bukkit.getOfflinePlayer(it).name ?: it.toString() }
         sender.sendMessage(PREFIX + "チーム " + team.name + " [" + team.members.size + "人]")
-        sender.sendMessage("メンバー: " + memberNames)
+        sender.sendMessage("メンバー: " + formatMemberNames(team))
     }
 
     override fun suggest(
