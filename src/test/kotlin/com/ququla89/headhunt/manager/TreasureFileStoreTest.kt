@@ -70,4 +70,39 @@ class TreasureFileStoreTest {
         val loaded = store.load()
         assertEquals(listOf(treasure), loaded.values.toList())
     }
+
+    @Test
+    fun `load falls back to backup when main file is missing`() {
+        val dataFile = tempDirectory.resolve("treasures_missing.yml").toFile()
+        val backupFile = tempDirectory.resolve("treasures_missing.yml.bak").toFile()
+        val treasure = Treasure(UUID.randomUUID(), "world", 5, 64, 6)
+        TreasureFileStore(backupFile, logger).save(listOf(treasure))
+
+        val loaded = TreasureFileStore(dataFile, logger).load()
+        assertEquals(listOf(treasure), loaded.values.toList())
+    }
+
+    @Test
+    fun `load falls back to backup when main file is empty`() {
+        val dataFile = tempDirectory.resolve("treasures_empty.yml").toFile()
+        val backupFile = tempDirectory.resolve("treasures_empty.yml.bak").toFile()
+        val treasure = Treasure(UUID.randomUUID(), "world", 7, 64, 8)
+        TreasureFileStore(backupFile, logger).save(listOf(treasure))
+        dataFile.writeText("")
+
+        val loaded = TreasureFileStore(dataFile, logger).load()
+        assertEquals(listOf(treasure), loaded.values.toList())
+    }
+
+    @Test
+    fun `load does not fall back to backup when main file intentionally saved empty treasures`() {
+        val dataFile = tempDirectory.resolve("treasures_cleared.yml").toFile()
+        val store = TreasureFileStore(dataFile, logger)
+        val treasure = Treasure(UUID.randomUUID(), "world", 9, 64, 10)
+        assertTrue(store.save(listOf(treasure)))
+        assertTrue(store.save(emptyList()))
+
+        val loaded = store.load()
+        assertTrue(loaded.isEmpty())
+    }
 }
