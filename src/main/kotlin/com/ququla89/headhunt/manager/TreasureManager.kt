@@ -156,38 +156,49 @@ class TreasureManager(
         var repaired = 0
         var removed = 0
         val unresolved = mutableListOf<TreasureValidationIssue>()
-        val locations = mutableSetOf<String>()
-        for (treasure in treasures.values.toList()) {
-            val locationKey = "${treasure.worldName}:${treasure.x}:${treasure.y}:${treasure.z}"
-            if (!locations.add(locationKey)) {
-                treasures.remove(treasure.id)
-                removed++
-                continue
-            }
-            val world = worldResolver(treasure.worldName)
+        val grouped = treasures.values.toList().groupBy { "${it.worldName}:${it.x}:${it.y}:${it.z}" }
+        for ((_, group) in grouped) {
+            val first = group.first()
+            val world = worldResolver(first.worldName)
             if (world == null) {
-                unresolved += TreasureValidationIssue(treasure, "ワールドが読み込まれていません。")
+                unresolved += TreasureValidationIssue(first, "ワールドが読み込まれていません。")
+                for (duplicate in group.drop(1)) {
+                    treasures.remove(duplicate.id)
+                    removed++
+                }
                 continue
             }
-            if (treasure.y !in world.minHeight until world.maxHeight) {
-                treasures.remove(treasure.id)
-                removed++
+            if (first.y !in world.minHeight until world.maxHeight) {
+                for (treasure in group) {
+                    treasures.remove(treasure.id)
+                    removed++
+                }
                 continue
             }
-            val block = world.getBlockAt(treasure.x, treasure.y, treasure.z)
+            val block = world.getBlockAt(first.x, first.y, first.z)
             val state = block.state as? Skull
             if (state == null) {
-                treasures.remove(treasure.id)
-                removed++
+                for (treasure in group) {
+                    treasures.remove(treasure.id)
+                    removed++
+                }
                 continue
             }
-            if (readTreasureId(block) == treasure.id) continue
+            val blockId = readTreasureId(block)
+            val keeper = group.firstOrNull { it.id == blockId } ?: first
+            for (other in group) {
+                if (other.id != keeper.id) {
+                    treasures.remove(other.id)
+                    removed++
+                }
+            }
+            if (blockId == keeper.id) continue
 
-            state.persistentDataContainer.set(treasureIdKey, PersistentDataType.STRING, treasure.id.toString())
+            state.persistentDataContainer.set(treasureIdKey, PersistentDataType.STRING, keeper.id.toString())
             if (state.update(true, false)) {
                 repaired++
             } else {
-                unresolved += TreasureValidationIssue(treasure, "ブロックの宝IDを修復できませんでした。")
+                unresolved += TreasureValidationIssue(keeper, "ブロックの宝IDを修復できませんでした。")
             }
         }
         return TreasureRepairResult(repaired, removed, unresolved)
