@@ -17,8 +17,7 @@ import java.util.UUID
 import java.util.logging.Logger
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class TreasureManagerRepairTest {
@@ -45,8 +44,8 @@ class TreasureManagerRepairTest {
         assertEquals(0, result.repaired)
         assertEquals(1, result.removed)
         assertTrue(result.unresolved.isEmpty())
-        assertNull(manager.find(staleId))
-        assertNotNull(manager.find(matchingId))
+        assertFalse(manager.contains(staleId))
+        assertTrue(manager.contains(matchingId))
         assertEquals(1, manager.size)
         verify(skull, never()).update(true, false)
     }
@@ -91,10 +90,63 @@ class TreasureManagerRepairTest {
         assertEquals(1, result.repaired)
         assertEquals(1, result.removed)
         assertTrue(result.unresolved.isEmpty())
-        assertNotNull(manager.find(firstId))
-        assertNull(manager.find(secondId))
+        assertTrue(manager.contains(firstId))
+        assertFalse(manager.contains(secondId))
         verify(skull.persistentDataContainer).set(key, PersistentDataType.STRING, firstId.toString())
         verify(skull).update(true, false)
+    }
+
+    @Test
+    fun `repairAll keeps first entry as unresolved and drops duplicates when world is unloaded`() {
+        val firstId = UUID.randomUUID()
+        val secondId = UUID.randomUUID()
+        val dataFile = writeDuplicateYaml(firstId, secondId)
+
+        val manager = TreasureManager(dataFile.toFile(), key, logger, { null })
+        manager.load()
+
+        val result = manager.repairAll()
+
+        assertEquals(0, result.repaired)
+        assertEquals(1, result.removed)
+        assertEquals(listOf(firstId), result.unresolved.map { it.treasure.id })
+        assertTrue(manager.contains(firstId))
+        assertFalse(manager.contains(secondId))
+        assertEquals(1, manager.size)
+    }
+
+    @Test
+    fun `repairAll removes all duplicates when y is out of world bounds`() {
+        val firstId = UUID.randomUUID()
+        val secondId = UUID.randomUUID()
+        val dataFile = tempDirectory.resolve("treasures_oob.yml")
+        Files.writeString(
+            dataFile,
+            """
+            treasures:
+              $firstId:
+                world: world
+                x: 10
+                y: 400
+                z: 20
+              $secondId:
+                world: world
+                x: 10
+                y: 400
+                z: 20
+            """.trimIndent(),
+        )
+
+        val world = mockWorld("world")
+        val manager = TreasureManager(dataFile.toFile(), key, logger, { if (it == "world") world else null })
+        manager.load()
+
+        val result = manager.repairAll()
+
+        assertEquals(0, result.repaired)
+        assertEquals(2, result.removed)
+        assertTrue(result.unresolved.isEmpty())
+        assertEquals(0, manager.size)
     }
 
     private fun writeDuplicateYaml(

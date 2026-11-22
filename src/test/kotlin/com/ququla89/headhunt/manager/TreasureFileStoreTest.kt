@@ -5,6 +5,8 @@ import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.UUID
+import java.util.logging.Handler
+import java.util.logging.LogRecord
 import java.util.logging.Logger
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -104,5 +106,31 @@ class TreasureFileStoreTest {
 
         val loaded = store.load()
         assertTrue(loaded.isEmpty())
+    }
+
+    @Test
+    fun `load returns empty without warnings when both main and backup files are missing`() {
+        val records = mutableListOf<LogRecord>()
+        val testLogger =
+            Logger.getLogger("test-store-${UUID.randomUUID()}").apply {
+                useParentHandlers = false
+                addHandler(
+                    object : Handler() {
+                        override fun publish(record: LogRecord) {
+                            records += record
+                        }
+
+                        override fun flush() {}
+
+                        override fun close() {}
+                    },
+                )
+            }
+        val dataFile = tempDirectory.resolve("treasures_none.yml").toFile()
+
+        val loaded = TreasureFileStore(dataFile, testLogger).load()
+
+        assertTrue(loaded.isEmpty())
+        assertTrue(records.isEmpty())
     }
 }

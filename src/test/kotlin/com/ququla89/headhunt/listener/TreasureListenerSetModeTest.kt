@@ -15,7 +15,6 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -53,7 +52,7 @@ class TreasureListenerSetModeTest {
         TreasureListener(treasures, game).onBlockPlace(event)
 
         assertTrue(event.isCancelled)
-        verify(player).sendMessage(anyString())
+        verify(player).sendMessage("§6[HeadHunt] §r§c登録済みの宝IDが複製された頭ブロックは設置できません。通常の頭ブロックを使用してください。")
         verify(treasures, never()).register(location)
     }
 
@@ -88,7 +87,9 @@ class TreasureListenerSetModeTest {
         TreasureListener(treasures, game).onInteract(event)
 
         assertTrue(event.isCancelled)
-        verify(player).sendMessage(anyString())
+        verify(player).sendMessage(
+            "§6[HeadHunt] §r§c別の座標で登録済みの宝IDが複製されています。スニーク右クリックで古いIDを解除してから再登録してください。",
+        )
         verify(treasures, never()).register(location)
     }
 
