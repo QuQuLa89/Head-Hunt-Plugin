@@ -93,6 +93,7 @@ class TreasureListenerInteractTest {
         `when`(game.isSetModeEnabled(player.uniqueId)).thenReturn(true)
         `when`(treasures.readTreasureId(block)).thenReturn(treasure.id)
         `when`(treasures.findAt(block)).thenReturn(treasure)
+        `when`(treasures.unregisterAt(block)).thenReturn(treasure)
         `when`(treasures.save()).thenReturn(true)
 
         val event = interactEvent(player, block)
@@ -101,6 +102,7 @@ class TreasureListenerInteractTest {
         assertTrue(event.isCancelled)
         verify(treasures).unregisterAt(block)
         verify(treasures).save()
+        verify(player).sendMessage("§6[HeadHunt] §r§a宝HEADの登録を解除しました。")
     }
 
     private fun mockPlayer(

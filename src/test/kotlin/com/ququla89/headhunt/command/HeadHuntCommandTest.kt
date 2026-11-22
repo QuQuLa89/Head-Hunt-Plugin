@@ -10,6 +10,7 @@ import com.ququla89.headhunt.model.TeamMode
 import com.ququla89.headhunt.model.Treasure
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import org.bukkit.entity.Player
+import org.mockito.ArgumentMatchers.contains
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -63,10 +64,13 @@ class HeadHuntCommandTest {
         val issue = TreasureValidationIssue(Treasure(UUID.randomUUID(), "world", 1, 64, 1), "テストエラー")
         `when`(treasures.validateAll()).thenReturn(listOf(issue))
         val game = mock(GameManager::class.java)
-        val stack = stackOf(mockAdminPlayer())
+        val player = mockAdminPlayer()
+        val stack = stackOf(player)
 
         HeadHuntCommand(treasures, TeamManager(), game).execute(stack, arrayOf("start", "solo"))
 
+        verify(treasures).validateAll()
+        verify(player).sendMessage(contains("問題があるため開始できません"))
         verify(game, never()).start(GameMode.SOLO, TeamMode.SHARED)
     }
 
